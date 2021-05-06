@@ -99,7 +99,7 @@ class DDL2AlembicParser:
             [cls.format_column(col) for col in table_dict.get("columns")]
         )
 
-        return f"""\
+        return table_name, f"""\
 op.create_table(
 {tab_spacing}'{table_name}',
 {tab_spacing}{formatted_columns}
@@ -111,10 +111,16 @@ op.create_table(
         """Converts raw ddl to an Alembic string."""
 
         cleaned_ddl = cls.clean_ddl(ddl)
-        parsed_tables = DDLParser(cleaned_ddl.replace("`", "")).run()
-        return """,\n--\n""".join(
-            [
-                cls.format_table(table, tab_spacing=tab_spacing)
-                for table in parsed_tables
-            ]
-        )
+        parsed_table = DDLParser(cleaned_ddl.replace("`", "")).run()
+        
+        # if the parsing fails, return "FAILED"
+        if not parsed_table:
+            return "FAILED"
+        else:
+            parsed_table = parsed_table[0]
+        
+        # Convert List to String: (for printing)
+        #return cls.format_table(parsed_table, tab_spacing=tab_spacing)
+        
+        # Return (tablename, formatted_table): (for selective printing)
+        return cls.format_table(parsed_table, tab_spacing=tab_spacing)
