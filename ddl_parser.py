@@ -57,6 +57,10 @@ class DDL2AlembicParser:
         # Sqlalchemy (sa) or Snowflake (sf)
         orm_type = 'sa'
         
+        ##################################################
+        #            SPECIAL COLUMN MAPPINGS             #
+        ##################################################
+        
         # Fix TIMESTAMP to be TIMESTAMP_TZ()
         if column_dict.get("type").upper() == "TIMESTAMP":
             column_type = "TIMESTAMP_TZ"
